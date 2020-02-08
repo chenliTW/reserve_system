@@ -1,0 +1,69 @@
+<html>
+    <head></head>
+    <body>
+        <div id="Y" style="display: inline">{{year}}</div>/<div id="M" style="display: inline">{{month}}</div>
+        <br>
+        <input type="submit" value="坐時光機回上個月" onclick="window.location='/reserve/{{prevmonth}}';" />&nbsp;&nbsp;
+        <input type="submit" value="回到這個月" onclick="window.location='/reserve/';" />&nbsp;&nbsp;
+        <input type="submit" value="穿越到下個月" onclick="window.location='/reserve/{{nextmonth}}';" />&nbsp;&nbsp;
+        <table border="1">
+            <tr><th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;日&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th><th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;一&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th><th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;二&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th><th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;三&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th><th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;四&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th><th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;五&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th><th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;六&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th></tr>
+            {% for week in cal:%}
+                <tr>
+                {% for day in week:%}
+                    <td {%if day[1]:%} style="background-color:cadetblue" {%endif%}  >
+                    {%if day[0]!=0:%}
+                        <center><div id="{{day[0]}}" sytle="height: 10px;width: 20px;">{{day[0]}}</div>
+                        <div id="{{day[0]}}_counter">{{day[1]}}個預約</div>
+                        <form method="GET" action="/reserve/register/{{year}}/{{month}}/{{day[0]}}">
+                            <button id="{{day[0]}}_button">我要預約</button>
+                        </form>
+                        </center>
+                    {%endif%}
+                    </td>
+                {% endfor %}
+                </tr>
+            {%endfor%}
+        </table>
+        登記表:<br>
+        <input type="submit" value="刪除昨天以前(含昨天)的預約" onclick="window.location='/reserve/flush_old/';" />  
+        <table id="list" border="1">
+            <tr><th>你的名字</th><th>地點</th><th>日期</th><th>開始時間</th><th>結束時間</th><th>刪除</th></tr>
+            {%for k,v in db:%}
+                <tr><td>{{k}}</td><td>{{v["place"]}}</td><td>{{v["date"]}}</td><td>{{v["starttime"]}}</td><td>{{v["endtime"]}}</td><td>
+                    <button type="button" onclick="if (confirm('你真的確定要刪除?你真的確定要刪除?你真的確定要刪除?你真的確定要刪除?'))window.location.href='/reserve/delete/{{k}}';">刪除</button>
+                </td></tr>
+            {%endfor%}
+        </table>
+        <br>
+        懇請大家拜託不要攻擊我的網站@@
+        <script>
+        var today=new Date();
+        var year = today.getFullYear();
+        var month = String(today.getMonth() + 1);
+        var day = String(today.getDate());
+        var x = document.getElementById("list").rows;
+        for(var i=1;i<x.length;i++){
+            if(x[i].cells[2].innerHTML==year+"/"+month+"/"+day){
+                x[i].cells[2].bgColor="orange";
+            }else{
+                break;
+            }
+        }
+        if(document.getElementById("Y").innerHTML==year&&document.getElementById("M").innerHTML==month){
+            document.getElementById(day).style.backgroundColor="orange";
+            for(var i=1;i<=today.getDate()-1;i++){
+                document.getElementById(String(i)+"_counter").innerHTML="無法預約";
+                document.getElementById(String(i)+"_button").innerHTML="無法預約";
+                document.getElementById(String(i)+"_button").disabled="disabled";
+            }
+        }else if(document.getElementById("Y").innerHTML<year||(document.getElementById("Y").innerHTML==year&&parseInt(document.getElementById("M").innerHTML)<parseInt(month))){
+            for(var i=1;i<=31;i++){
+                document.getElementById(String(i)+"_counter").innerHTML="無法預約";
+                document.getElementById(String(i)+"_button").innerHTML="無法預約";
+                document.getElementById(String(i)+"_button").disabled="disabled";
+            }            
+        }
+        </script>
+    </body>
+</html>
